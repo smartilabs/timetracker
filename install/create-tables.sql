@@ -34,5 +34,5 @@ CREATE TABLE `Track` (
   INDEX `IX_Track_IsDeleted` (`IsDeleted`),
   CONSTRAINT `FK_Track_Module` FOREIGN KEY (`ModuleID`) REFERENCES `Module` (`ModuleID`),
   CONSTRAINT `FK_Track_User` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
-  CONSTRAINT `FK_Track_TaskType` FOREIGN KEY (`TaskTypeID`) REFERENCES `timetracker`.`TaskType` (`TaskTypeID`)
+  CONSTRAINT `FK_Track_TaskType` FOREIGN KEY (`TaskTypeID`) REFERENCES `TaskType` (`TaskTypeID`)
 );
