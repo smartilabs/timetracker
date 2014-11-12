@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta name="description" content="SmartiTracker - extra simple time tracker"/>
+	<meta name="keywords" content=""/>
+
+	{% block head %}
+	<link rel="stylesheet" href="{{ baseUrl }}css/style.css"/>
+	<title>SmartiTracker | extra simple time tracker</title>
+	{% endblock %}
+</head>
+
+<body>
+	<header>
+		<h1>
+			SmartiTracker
+		</h1>
+		{% if (user) %}
+		<div class="details">
+			<span>Logged in as bbos</span>
+			<a href="{{ baseUrl }}logout">[logout]</a>
+		</div>
+		{% endif %}
+	</header>
+
+	<div id="content">{% block content %}{% endblock %}</div>
+
+	<footer>
+		{% block footer %}
+		&copy; 2014 SmartiLabs | SmartiTracker&trade;
+		{% endblock %}
+	</footer>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript" src="{{ baseUrl }}js/jquery.inputmask.js"></script>
+	<script type="text/javascript" src="{{ baseUrl }}js/jquery.inputmask.date.extensions.js"></script>
+	<script type="text/javascript" src="{{ baseUrl }}js/jquery.magicmove.js"></script>
+	<script type="text/javascript" src="{{ baseUrl }}js/main.js"></script>
+</body>
+
+</html>

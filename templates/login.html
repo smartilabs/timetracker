@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login">
+	<form method="post" action="{{ baseUrl }}login">
+		<label>
+			<span>Username: </span>
+			<input type="text" name="username"/>
+		</label>
+
+		<label>
+			<span>Password: </span>
+			<input type="password" name="password"/>
+		</label>
+
+		<br/>
+
+		{% if (invalid) %}
+		<p class="error">Login invalid, try again.</p>
+		<br/>
+		{% endif %}
+
+		<input type="submit" value="Login"/>
+	</form>
+</div>
+{% endblock %}

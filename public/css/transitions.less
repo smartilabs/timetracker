@@ -1,0 +1,52 @@
+.transition (@t) {
+  -webkit-transition: @t;
+  -moz-transition: @t;
+  transition: @t;
+}
+
+.backface-visibility (@v) {
+  -moz-backface-visibility: @v;
+  -webkit-backface-visibility: @v;
+  backface-visibility: @v;
+}
+
+.transform (@t) {
+  -moz-transform: @t;
+  -webkit-transform: @t;
+  -o-transform: @t;
+  transform: @t;
+}
+
+.animate(@animation) {
+  -webkit-animation: @animation;
+  -moz-animation: @animation;
+  -ms-animation: @animation;
+  -o-animation: @animation;
+  animation: @animation;
+}
+
+.animate-once (@name, @time) {
+  -webkit-animation-direction: normal;
+  -webkit-animation-duration: @time;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-name: @name;
+  -webkit-animation-timing-function: ease;
+
+  -ms-animation-direction: normal;
+  -ms-animation-duration: @time;
+  -ms-animation-iteration-count: 1;
+  -ms-animation-name: @name;
+  -ms-animation-timing-function: ease;
+
+  -moz-animation-direction: normal;
+  -moz-animation-duration: @time;
+  -moz-animation-iteration-count: 1;
+  -moz-animation-name: @name;
+  -moz-animation-timing-function: ease;
+
+  animation-direction: normal;
+  animation-duration: @time;
+  animation-iteration-count: 1;
+  animation-name: @name;
+  animation-timing-function: ease;
+}

@@ -1,0 +1,23 @@
+{
+  "name" : "smartilabs/timetracker",
+  "description" : "Simple time tracker",
+  "minimum-stability" : "stable",
+  "authors" : [
+    {
+      "name" : "bbos",
+      "email" : "bostjan@smartilabs.si"
+    }
+  ],
+  "require" : {
+    "php" : ">=5.3.0",
+    "slim/slim" : "2.2.*",
+    "slim/extras" : "2.*",
+    "twig/twig" : "1.*",
+    "illuminate/database": "*"
+  },
+  "autoload" : {
+    "classmap" : [
+      "models"
+    ]
+  }
+}

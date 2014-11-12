@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="details">
+	<select class="months" data-month="{{ month }}" data-year="{{ year }}">
+		{% for m in months %}
+		{% set selected = m.Selected ? ' selected="selected" ' : null %}
+		<option value="{{baseUrl}}{{ m.Year }}/{{ m.Month|padZero}}" {{ selected }}>{{ m.Year }} / {{ m.Month|padZero }}</option>
+		{% endfor %}
+	</select>
+
+	<a href="">[export month]</a>
+	<a href="">[export all]</a>
+</div>
+
+<div class="track-list {{ emptyRow ? ' add-empty-row ' : null }}">
+	{% set lastDate = null %}
+	{% set hoursSum = 0 %}
+
+	{% for track in tracks %}
+
+	{% set currentDate = track.TimeStart|date('m.d.Y') %}
+	{% set nextDate = currentDate != lastDate %}
+	{% set lastDate = currentDate %}
+	{% set hours = track.TimeStart|diff(track.TimeEnd) %}
+	{% set hoursSum = hoursSum + hours %}
+
+	{% include 'track.html' %}
+	
+	{% endfor %}
+
+	<div class="track-sum">
+		<span></span>
+		<span></span>
+		<span></span>
+		<span class="sum">SUM:</span>
+		<span class="hours">{{ hoursSum|number_format(2) }}</span>
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+	</div>
+</div>
+{% endblock %}

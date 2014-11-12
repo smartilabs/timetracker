@@ -1,0 +1,47 @@
+<div class="track {{ nextDate ? 'date-start' }}" data-track="{{ track.TrackID }}">
+		<span class="location">
+			<select name="location">
+				<option value="Office">Office</option>
+				<option value="Home">Home</option>
+			</select>
+		</span>
+		<span class="date">
+			<input type="text" name="date" value="{{ (track.TimeStart ?: date)|date('d.m.Y') }}" data-inputmask="'mask':'d.m.y'" class="date" />
+		</span>
+		<span class="time-start">
+			<input type="text" name="time-start" value="{{ (track.TimeStart ?: timeStart)|date('H:i') }}" data-inputmask="'mask':'99:99'" class="time" />
+		</span>
+		<span class="time-end">
+			<input type="text" name="time-end" value="{{ (track.TimeEnd ?: timeStart)|date('H:i') }}" data-inputmask="'mask':'99:99'" class="time" />
+		</span>
+	<span class="hours">{{ hours ?: '0' }}</span>
+	<span class="description">
+		<textarea name="description" placeholder="Task description">{{ track.Description }}</textarea>
+	</span>
+	<span class="task-type">
+		<select name="task-type">
+			{% for taskType in taskTypes %}
+			<option value="{{ taskType.TaskTypeID }}"
+			{{ (track.TaskType == taskType.Name) ? ' selected="selected" ' }}
+			>{{ taskType.Name }}
+			</option>
+			{% endfor %}
+		</select>
+	</span>
+	<span class="module">
+		<select name="module">
+			{% for module in modules %}
+			<option value="{{ module.ModuleID }}"
+			{{ (track.Module == module.Name) ? ' selected="selected" ' }}>{{ module.Name }}</option>
+			{% endfor %}
+		</select>
+	</span>
+	<span class="ticket">
+		<input type="text" name="ticket" value="{{ track.Ticket }}" placeholder="Ticket"/>
+	</span>
+	<span class="action">
+		<span class="warning-icon" title="Error occured while saving track"></span>
+		<a href="#" class="add">[add]</a>
+		<a href="#" class="remove critical">[remove]</a>
+	</span>
+</div>

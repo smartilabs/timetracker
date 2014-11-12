@@ -1,0 +1,286 @@
+body {
+  font-family: Calibri, Verdana, Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  color: #555555;
+}
+a:link,
+a:visited {
+  color: #5677fc;
+  text-decoration: none;
+}
+a:link.critical,
+a:visited.critical {
+  color: #e02222;
+}
+a:active,
+a:hover {
+  text-decoration: underline;
+}
+h1,
+h2 {
+  margin-bottom: 3px;
+}
+div.details {
+  padding-bottom: 20px;
+  padding-left: 10px;
+}
+div.details input,
+div.details select,
+div.details textarea {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-family: Calibri, Verdana, Arial, Helvetica, sans-serif;
+  color: #555555;
+  font-size: 14px;
+}
+div.details select {
+  margin-right: 10px;
+}
+div.details select.months {
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  padding-right: 10px;
+}
+div.details span,
+div.details a {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: normal;
+  margin-right: 10px;
+  vertical-align: bottom;
+}
+div.track-list {
+  display: table;
+}
+div.track-list input,
+div.track-list select,
+div.track-list textarea {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-family: Calibri, Verdana, Arial, Helvetica, sans-serif;
+  color: #555555;
+  font-size: 14px;
+}
+div.track-list > div.track,
+div.track-list > div.track-sum {
+  display: table-row;
+  background-color: transparent;
+  -webkit-transition: all 0.5s ease 0s;
+  -moz-transition: all 0.5s ease 0s;
+  transition: all 0.5s ease 0s;
+}
+div.track-list > div.track.shadow,
+div.track-list > div.track-sum.shadow {
+  box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.15);
+}
+div.track-list > div.track.date-start > span,
+div.track-list > div.track-sum.date-start > span {
+  border-top: 1px solid #dddddd;
+}
+div.track-list > div.track:first-child > span,
+div.track-list > div.track-sum:first-child > span {
+  border-top: 3px solid #bbbbbb;
+}
+div.track-list > div.track input,
+div.track-list > div.track-sum input,
+div.track-list > div.track textarea,
+div.track-list > div.track-sum textarea,
+div.track-list > div.track select,
+div.track-list > div.track-sum select {
+  background: transparent;
+}
+div.track-list > div.track > span,
+div.track-list > div.track-sum > span {
+  display: table-cell;
+  padding: 4px 6px;
+  vertical-align: top;
+}
+div.track-list > div.track > span.description,
+div.track-list > div.track-sum > span.description {
+  min-width: 300px;
+}
+div.track-list > div.track > span.description textarea,
+div.track-list > div.track-sum > span.description textarea {
+  width: 100%;
+  height: 20px;
+  resize: none;
+}
+div.track-list > div.track > span.hours,
+div.track-list > div.track-sum > span.hours {
+  min-width: 50px;
+  text-align: right;
+  font-weight: bold;
+}
+div.track-list > div.track > span.date input,
+div.track-list > div.track-sum > span.date input {
+  color: #cccccc;
+  width: 80px;
+}
+div.track-list > div.track > span.date input:focus,
+div.track-list > div.track-sum > span.date input:focus {
+  color: #555555;
+}
+div.track-list > div.track > span.time-start input,
+div.track-list > div.track-sum > span.time-start input,
+div.track-list > div.track > span.time-end input,
+div.track-list > div.track-sum > span.time-end input {
+  width: 50px;
+}
+div.track-list > div.track > span.ticket input,
+div.track-list > div.track-sum > span.ticket input {
+  width: 50px;
+}
+div.track-list > div.track.date-start span.date input,
+div.track-list > div.track-sum.date-start span.date input {
+  color: #555555;
+}
+div.track-list > div.track span.action,
+div.track-list > div.track-sum span.action {
+  position: absolute;
+  font-size: 0.9em;
+  border: none;
+  white-space: nowrap;
+}
+div.track-list > div.track span.action > a,
+div.track-list > div.track-sum span.action > a {
+  visibility: hidden;
+}
+div.track-list > div.track span.action .warning-icon,
+div.track-list > div.track-sum span.action .warning-icon {
+  display: none;
+  width: 20px;
+  height: 16px;
+  background: transparent url("../img/warning-icon.png") center center no-repeat;
+}
+div.track-list > div.track:hover span.action > a,
+div.track-list > div.track-sum:hover span.action > a,
+div.track-list > div.track:active span.action > a,
+div.track-list > div.track-sum:active span.action > a,
+div.track-list > div.track.active span.action > a,
+div.track-list > div.track-sum.active span.action > a {
+  visibility: visible;
+}
+div.track-list > div.track.loading span.action,
+div.track-list > div.track-sum.loading span.action {
+  background: transparent url("../img/loader.gif") no-repeat left center;
+  padding-left: 25px;
+}
+div.track-list > div.track.success > span:not(.action),
+div.track-list > div.track-sum.success > span:not(.action) {
+  -webkit-animation-direction: normal;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-name: flashgreen;
+  -webkit-animation-timing-function: ease;
+  -ms-animation-direction: normal;
+  -ms-animation-duration: 1s;
+  -ms-animation-iteration-count: 1;
+  -ms-animation-name: flashgreen;
+  -ms-animation-timing-function: ease;
+  -moz-animation-direction: normal;
+  -moz-animation-duration: 1s;
+  -moz-animation-iteration-count: 1;
+  -moz-animation-name: flashgreen;
+  -moz-animation-timing-function: ease;
+  animation-direction: normal;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+  animation-name: flashgreen;
+  animation-timing-function: ease;
+}
+div.track-list > div.track.warning > span:not(.action),
+div.track-list > div.track-sum.warning > span:not(.action) {
+  -webkit-animation-direction: normal;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-name: flashred;
+  -webkit-animation-timing-function: ease;
+  -ms-animation-direction: normal;
+  -ms-animation-duration: 1s;
+  -ms-animation-iteration-count: 1;
+  -ms-animation-name: flashred;
+  -ms-animation-timing-function: ease;
+  -moz-animation-direction: normal;
+  -moz-animation-duration: 1s;
+  -moz-animation-iteration-count: 1;
+  -moz-animation-name: flashred;
+  -moz-animation-timing-function: ease;
+  animation-direction: normal;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+  animation-name: flashred;
+  animation-timing-function: ease;
+}
+div.track-list > div.track.warning span.action .warning-icon,
+div.track-list > div.track-sum.warning span.action .warning-icon {
+  display: inline-block;
+}
+div.track-list > div.track.invalid > span:not(.action),
+div.track-list > div.track-sum.invalid > span:not(.action) {
+  background-color: rgba(255, 247, 110, 0.43);
+}
+div.track-list > div.track-sum > span {
+  border-top: 3px solid #bbbbbb;
+}
+div.track-list > div.track-sum > span.sum {
+  text-align: right;
+}
+@-webkit-keyframes flashgreen {
+  0%,
+  100% {
+    background-color: white;
+  }
+  50% {
+    background-color: #aaeea8;
+  }
+}
+@keyframes flashgreen {
+  0%,
+  100% {
+    background-color: white;
+  }
+  50% {
+    background-color: #aaeea8;
+  }
+}
+@-webkit-keyframes flashred {
+  0%,
+  100% {
+    background-color: white;
+  }
+  50% {
+    background-color: #e02222;
+  }
+}
+@keyframes flashred {
+  0%,
+  100% {
+    background-color: white;
+  }
+  50% {
+    background-color: #e02222;
+  }
+}
+footer {
+  margin-top: 15px;
+}
+div.login {
+  width: 200px;
+}
+div.login label {
+  display: block;
+}
+div.login label input {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+div.login p.error {
+  margin: 0;
+  padding: 0;
+  color: #f00;
+  font-size: 13px;
+}
