@@ -488,11 +488,9 @@
         return "Not all tracks are saved, do you want to leave the page?";
     }
 
-    // if empty month, prepare first track
-    if (!trackList.find('.track').length)
-      prepareTrack();
 
-    if (trackList.hasClass('add-empty-row'))
+    // if empty month || add-empty-row flag, prepare new track
+    if (!trackList.find('.track').length || trackList.hasClass('add-empty-row'))
       setTimeout(function() {
         prepareTrack();
       }, 300);

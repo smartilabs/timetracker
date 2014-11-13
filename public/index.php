@@ -14,19 +14,6 @@ $app = new \Slim\Slim([
   'session.handler' => null
 ]);
 
-// prepare session middleware
-//$app->add(new \Slim\Middleware\SessionCookie(array(
-//  'expires' => '60 minutes',
-//  'path' => '/',
-//  'domain' => null,
-//  'secure' => true,
-//  'httponly' => true,
-//  'name' => 'slim_session',
-//  'secret' => 'Thi$1Ss0meeXtremlyS3cureS3ct3t',
-//  'cipher' => MCRYPT_RIJNDAEL_256,
-//  'cipher_mode' => MCRYPT_MODE_CBC
-//)));
-
 // prepare base url
 $app->hook('slim.before', function () use ($app) {
   $app->view()->appendData([
@@ -95,6 +82,11 @@ $app->get('/:year/:month', 'authenticate', function ($year, $month) use ($app) {
 
   $tracks = Track::getMonthForUser($year, $month, $userID);
   $months = Track::getMonthList($userID);
+
+  // for fresh users
+  if (! $months->count()) {
+    $months[] = ['Month' => $currentMonth, 'Year' => $currentYear];
+  }
 
   // set selected
   foreach ($months as &$m) {

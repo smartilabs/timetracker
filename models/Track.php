@@ -116,7 +116,10 @@ class Track extends Illuminate\Database\Eloquent\Model
   {
     $track = $trackID ? Track::getTrack($trackID) : new Track();
 
-    $track->UserID = 1;
+    $user = $_SESSION['UserAuthenticated'];
+    $userID = $user['UserID'];
+
+    $track->UserID = $userID;
     $track->Location = $data['Location'];
     $track->TimeStart = $data['TimeStart'];
     $track->TimeEnd = $data['TimeEnd'];
