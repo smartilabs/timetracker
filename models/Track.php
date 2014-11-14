@@ -9,11 +9,6 @@ class Track extends Illuminate\Database\Eloquent\Model
   protected $primaryKey = 'TrackID';
   public $timestamps = false;
 
-  public function taskType ()
-  {
-    return $this->belongs_to('TaskType', 'TaskTypeID');
-  }
-
   public static function getMonthForUser ($year, $month, $userID)
   {
     // just a basic precaution
@@ -103,8 +98,12 @@ class Track extends Illuminate\Database\Eloquent\Model
       $newData['ModuleID'] = (int) $data['ModuleID'];
 
     // ticket is numeric and positive
-    if (isset($data['Ticket']) && $data['Ticket'] > 0)
-      $newData['Ticket'] = (int) $data['Ticket'];
+    if (isset($data['Ticket'])) {
+      $ticket = (int) str_replace('#', null, $data['Ticket']);
+
+      if ($ticket > 0)
+        $newData['Ticket'] = $ticket;
+    }
 
     if (isset($data['Description']) && $data['Description'])
       $newData['Description'] = $data['Description'];

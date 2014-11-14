@@ -6,12 +6,18 @@
 	<select class="months" data-month="{{ month }}" data-year="{{ year }}">
 		{% for m in months %}
 		{% set selected = m.Selected ? ' selected="selected" ' : null %}
-		<option value="{{baseUrl}}{{ m.Year }}/{{ m.Month|padZero}}" {{ selected }}>{{ m.Year }} / {{ m.Month|padZero }}</option>
+		<option value="{{baseUrl}}{{ m.Year }}/{{ m.Month|padZero}}"
+		{{ selected }}>{{ m.Year }} / {{ m.Month|padZero }}</option>
 		{% endfor %}
 	</select>
 
-	<a href="">[export month]</a>
-	<a href="">[export all]</a>
+	<a href="{{ baseUrl }}export/{{ year }}/{{ month }}">[export month]</a>
+	<a href="{{ baseUrl }}export-all">[export all]</a>
+
+	{% if (user.RoleID == 'admin') %}
+	<a href="{{ baseUrl }}export-all-users/{{ year }}/{{ month }}">[export all users for month]</a>
+	<a href="{{ baseUrl }}export-all-users">[export all users all time]</a>
+	{% endif %}
 </div>
 
 <div class="track-list {{ emptyRow ? ' add-empty-row ' : null }}">
@@ -27,7 +33,7 @@
 	{% set hoursSum = hoursSum + hours %}
 
 	{% include 'track.html' %}
-	
+
 	{% endfor %}
 
 	<div class="track-sum">

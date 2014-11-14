@@ -50,7 +50,7 @@
     });
 
     // prepare new track and append it after current line, or to the end of table
-    function prepareTrack(after) {
+    function prepareTrack(after, silent, lines) {
       var href = '/track/empty';
 
       var data = {};
@@ -64,6 +64,12 @@
         data['time-end'] = timeEnd;
       }
 
+      if (lines)
+        data['lines'] = lines;
+
+
+      var promise = new $.Deferred();
+
       $.ajax({
         url : href,
         type : 'POST',
@@ -71,30 +77,60 @@
         data : data
       }).done(function(data) {
           if (data.Status == 'Success') {
-            var newTrack = $(data.TrackHtml);
+            if (!lines)
+              lines = 1;
 
-            if (after)
-              after.after(newTrack);
-            else
-              trackList.prepend(newTrack);
+            for (var i = 0; i < lines; i++) {
+              var newTrack = $(data.TrackHtml);
 
-            newTrack.addClass('invalid');
-            newTrack.find('input[name=time-start]').focus().select();
+              if (after)
+                after.after(newTrack);
+              else
+                trackSum.before(newTrack);
 
-            sortTracks(newTrack);
+              newTrack.addClass('unedited');
+
+              if (!silent) {
+                newTrack.addClass('invalid');
+                newTrack.find('input[name=time-start]').focus().select();
+
+                sortTracks(newTrack);
+              }
+            }
+
+            promise.resolve();
           }
         });
 
-      return $('<div/>');
+      return promise.promise();
     }
 
     // trigger all input masks
-    trackList.on('focusin', ':input', function() {
+    trackList.on('focusin', 'input, textarea', function() {
       var input = $(this);
 
       if (!input.data('has-inputmask')) {
         input.inputmask();
         input.data('has-inputmask', true)
+      }
+
+      if (!input.data('trackpaste')) {
+        input.gridpaste({
+          onLineMissing : function(lines) {
+            return prepareTrack(null, true, lines);
+          },
+          callback : function() {
+            var tracks = trackList.find('div.track');
+            tracks.each(function() {
+              var track = $(this);
+              saveTrack(track);
+              sortTracks(track);
+              calculateHours(track);
+              resizeAllTextArea();
+            })
+          }
+        });
+        input.data('trackpaste', true);
       }
     });
 
@@ -214,6 +250,8 @@
     }
 
     function saveTrack(track) {
+      track.removeClass('unedited');
+
       var isValid = validTrack(track);
 
       track.toggleClass('invalid', !isValid);
@@ -331,8 +369,6 @@
         var hours = track.find('span.hours');
         hours.text(difference.toFixed(2));
       }
-
-      hours.text(difference.toFixed(2));
 
       sumHours();
     }
@@ -483,8 +519,16 @@
       })
     }
 
+    // resize all textareas
+    function resizeAllTextArea() {
+      $('textarea', trackList).each(function() {
+        var textarea = $(this);
+        textarea.height(textarea.prop('scrollHeight'));
+      });
+    }
+
     window.onbeforeunload = function() {
-      if (trackList.find('.track.invalid').length)
+      if (trackList.find('.track.invalid:not(.unedited)').length)
         return "Not all tracks are saved, do you want to leave the page?";
     }
 
@@ -495,11 +539,8 @@
         prepareTrack();
       }, 300);
 
-    // resize all textareas
-    $('textarea', trackList).each(function() {
-      var textarea = $(this);
-      textarea.height(textarea.prop('scrollHeight'));
-    });
+
+    resizeAllTextArea();
   }
 
   if (login.length) {

@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Europe/Ljubljana');
+
 session_start();
 
 require '../vendor/autoload.php';
@@ -23,7 +25,7 @@ $app->hook('slim.before', function () use ($app) {
 });
 
 // route middleware for simple API authentication
-function authenticate (\Slim\Route $route)
+function authenticated (\Slim\Route $route)
 {
   $app = \Slim\Slim::getInstance();
   $user = isset($_SESSION['UserAuthenticated']) ? $_SESSION['UserAuthenticated'] : null;
@@ -31,9 +33,21 @@ function authenticate (\Slim\Route $route)
   if (! validateUser($user)) {
     $app->response()->redirect('/login');
   }
+
+  return $user;
 }
 
-function authenticated (\Slim\Route $route)
+function admin (\Slim\Route $route)
+{
+  $user = authenticated($route);
+
+  if ($user['RoleID'] != 'admin') {
+    $app = \Slim\Slim::getInstance();
+    $app->response()->redirect('/login');
+  }
+}
+
+function guest (\Slim\Route $route)
 {
   $app = \Slim\Slim::getInstance();
   $user = isset($_SESSION['UserAuthenticated']) ? $_SESSION['UserAuthenticated'] : null;
@@ -66,14 +80,13 @@ $twig->addFilter($function);
 
 require '../app/database.php';
 
-$app->get('/', 'authenticate', function () use ($app) {
+$app->get('/', 'authenticated', function () use ($app) {
   $currentMonth = date('/Y/m', time());
   $app->response()->redirect($currentMonth);
 });
 
-$app->get('/:year/:month', 'authenticate', function ($year, $month) use ($app) {
+$app->get('/:year/:month', 'authenticated', function ($year, $month) use ($app) {
   // display track by month
-
   $currentMonth = (int) date('m');
   $currentYear = (int) date('Y');
 
@@ -83,19 +96,35 @@ $app->get('/:year/:month', 'authenticate', function ($year, $month) use ($app) {
   $tracks = Track::getMonthForUser($year, $month, $userID);
   $months = Track::getMonthList($userID);
 
+  $currentMonthData = ['Month' => $currentMonth, 'Year' => $currentYear];
+
   // for fresh users
   if (! $months->count()) {
-    $months[] = ['Month' => $currentMonth, 'Year' => $currentYear];
+    $months[] = $currentMonthData;
   }
 
   // set selected
+  $hasCurrentMonth = false;
+  $hasSelected = false;
   foreach ($months as &$m) {
-    if ($m['Month'] == $month && $m['Year'] == $year)
+    if ($m['Month'] == $month && $m['Year'] == $year) {
       $m['Selected'] = true;
+      $hasSelected = true;
+    }
+
+    if ((int) $m['Month'] == $currentMonth && (int) $m['Year'] == $currentYear)
+      $hasCurrentMonth = true;
   }
 
-  $modules = Module::all()->toArray();
-  $taskTypes = TaskType::all()->toArray();
+  if (! $hasCurrentMonth) {
+    if (! $hasSelected)
+      $currentMonthData['Selected'] = true;
+
+    $months[] = $currentMonthData;
+  }
+
+  $modules = Module::all()->sortBy('Name')->toArray();
+  $taskTypes = TaskType::all()->sortBy('Name')->toArray();
 
   $app->render('tracks.html', [
     'tracks' => $tracks->toArray(),
@@ -106,20 +135,120 @@ $app->get('/:year/:month', 'authenticate', function ($year, $month) use ($app) {
     'modules' => $modules,
     'emptyRow' => ((int) $year == $currentYear && $currentMonth == (int) $month)
   ]);
-})->conditions(array('year' => '(20)\d\d', 'month' => '\d\d'));
+})->conditions(array('year' => '(20)\d\d', 'month' => '\d(\d)?'));
 
-$app->get('/module/list', 'authenticate', function () use ($app) {
-  // echo Module::all()->toJson();
 
-  $modules = Module::all();
-  $app->render('modules.html', array('modules' => $modules->toArray()));
+$app->get('/export/:year/:month', 'authenticated', function ($year, $month) use ($app) {
+  $user = $_SESSION['UserAuthenticated'];
+  $userID = $user['UserID'];
+
+  $tracks = Track::getMonthForUser($year, $month, $userID);
+  $months = Track::getMonthList($userID);
+
+  $export = new Export();
+  $export->generateSingle($tracks->toArray());
+
+  exit;
+})->conditions(array('year' => '(20)\d\d', 'month' => '\d(\d)?'));
+
+$app->get('/export-all', 'authenticated', function () use ($app) {
+  $user = $_SESSION['UserAuthenticated'];
+  $userID = $user['UserID'];
+
+  $months = Track::getMonthList($userID);
+
+  if (empty($months) || ! $months->count())
+    $app->response()->redirect('/');
+
+  $data = [];
+  foreach ($months as $m) {
+    $month = $m['Month'];
+    $year = $m['Year'];
+
+    $monthlyTracks = Track::getMonthForUser($year, $month, $userID)->toArray();
+
+    if (empty($monthlyTracks))
+      continue;
+
+    $monthData = [
+      'Month' => $month,
+      'Year' => $year,
+      'Data' => $monthlyTracks
+    ];
+
+    $data[] = $monthData;
+  }
+
+  if (empty($data))
+    $app->response()->redirect('/');
+
+  $export = new Export();
+  $export->generateAllMonths($data);
+
+  exit;
 });
 
-$app->post('/track/empty', 'authenticate', function () use ($app) {
+$app->get('/export-all-users(/:year/:month)', 'admin', function ($year = null, $month = null) use ($app) {
+  $users = User::all()->toArray();
+
+  $currentMonth = $year && $month ? [[
+    'Month' => $month,
+    'Year' => $year
+  ]] : null;
+
+  $data = [];
+  foreach ($users as $user) {
+    $userID = $user['UserID'];
+
+    $months = empty($currentMonth) ? Track::getMonthList($userID)->toArray() : $currentMonth;
+
+    if (empty($months))
+      continue;
+
+    $userData = [
+      'User' => $user,
+      'MonthData' => []
+    ];
+
+    foreach ($months as $m) {
+      $month = $m['Month'];
+      $year = $m['Year'];
+
+      $monthlyTracks = Track::getMonthForUser($year, $month, $userID)->toArray();
+
+      if (empty($monthlyTracks))
+        continue;
+
+      $monthData = [
+        'Month' => $month,
+        'Year' => $year,
+        'Data' => $monthlyTracks
+      ];
+
+      $userData['MonthData'][] = $monthData;
+    }
+
+    if (empty($userData['MonthData']))
+      continue;
+
+    $data[] = $userData;
+  }
+
+  if (empty($data))
+    $app->response()->redirect('/');
+
+  $export = new Export();
+  $export->generateAllUsers($data);
+
+  exit;
+})->conditions(array('year' => '(20)\d\d', 'month' => '\d(\d)?'));
+
+
+$app->post('/track/empty', 'authenticated', function () use ($app) {
   header("Content-Type: application/json");
 
-  $taskTypes = TaskType::all()->toArray();
-  $modules = Module::all()->toArray();
+  $modules = Module::all()->sortBy('Name')->toArray();
+  $taskTypes = TaskType::all()->sortBy('Name')->toArray();
 
   $req = $app->request();
   $date = $req->params('date');
@@ -156,7 +285,7 @@ $app->post('/track/empty', 'authenticate', function () use ($app) {
   exit;
 });
 
-$app->post('/track', 'authenticate', function () use ($app) {
+$app->post('/track', 'authenticated', function () use ($app) {
   header("Content-Type: application/json");
 
   $req = $app->request();
@@ -182,7 +311,7 @@ $app->post('/track', 'authenticate', function () use ($app) {
   exit;
 });
 
-$app->post('/track/delete/:id', 'authenticate', function ($trackID) use ($app) {
+$app->post('/track/delete/:id', 'authenticated', function ($trackID) use ($app) {
   header("Content-Type: application/json");
 
   $track = Track::getTrack($trackID);
@@ -198,7 +327,7 @@ $app->post('/track/delete/:id', 'authenticate', function ($trackID) use ($app) {
 });
 
 // update track by id
-$app->post('/track/:id', 'authenticate', function ($id) use ($app) {
+$app->post('/track/:id', 'authenticated', function ($id) use ($app) {
   header("Content-Type: application/json");
 
   $req = $app->request();
@@ -248,19 +377,40 @@ $app->post('/track/:id', 'authenticate', function ($id) use ($app) {
 });
 
 // display login screen
-$app->get('/logout', 'authenticate', function () use ($app) {
+$app->get('/password', 'authenticated', function () use ($app) {
+  $app->render('password.html', [
+    'invalid' => $app->request()->params('invalid') == 1
+  ]);
+});
+
+$app->post('/password', 'authenticated', function () use ($app) {
+  $password = $app->request()->params('password');
+  $passwordCheck = $app->request()->params('password-check');
+
+  if (strlen($password) > 5 && $password == $passwordCheck) {
+    User::updatePassword($password);
+    $app->flash('info', 'Password successfully changed');
+    $app->response()->redirect('/');
+  }
+  else {
+    $app->response()->redirect('/password?invalid=1');
+  }
+});
+
+// display login screen
+$app->get('/logout', 'authenticated', function () use ($app) {
   unset($_SESSION['UserAuthenticated']);
   $app->response()->redirect('/');
 });
 
 // display login screen
-$app->get('/login', 'authenticated', function () use ($app) {
+$app->get('/login', 'guest', function () use ($app) {
   $app->render('login.html', [
     'invalid' => $app->request()->params('invalid') == 1
   ]);
 });
 
-$app->post('/login', 'authenticated', function () use ($app) {
+$app->post('/login', 'guest', function () use ($app) {
   try {
     $username = $app->request()->params('username');
     $password = $app->request()->params('password');
