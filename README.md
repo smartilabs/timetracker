@@ -8,6 +8,12 @@ Application goal:
 Simple tracking of time for me and my coworkers, with simple summary export for user or group, by month or all time.
 
 ### Features:
+ * Excel-like data paste
+ * Export to excel with multiple views:
+   - current month, 
+   - current user all months, 
+   - all users current month with summary by modules [admin only]
+   - all users all time with summary by modules [admin only]
  * Multiple user (users can be manually added in database with MD5 encoded passwords)
  * Masked input fields, prevent wrong data entry
  * Tracks (or rows) for multiple tasks
@@ -30,8 +36,7 @@ Simple tracking of time for me and my coworkers, with simple summary export for 
  * If trying to leave page with unsaved tracks, warning is shown
 
 ### Todo:
- * Prepare all data export (now there are just empty links)
- 
+ * When pasting data everything must be in exact format - for ex.: hour must bo 09:15, it can't be 9:15. Got to enable some parsing/validation prior to changing cell value
 
 ### How to install:
  * Create new database (name it "timetracker" or "smartitracker")
