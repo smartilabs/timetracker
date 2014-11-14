@@ -13,7 +13,8 @@
     "slim/slim" : "2.2.*",
     "slim/extras" : "2.*",
     "twig/twig" : "1.*",
-    "illuminate/database": "*"
+    "illuminate/database" : "*",
+    "phpoffice/phpexcel" : "dev-master"
   },
   "autoload" : {
     "classmap" : [
