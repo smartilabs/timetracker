@@ -28,19 +28,23 @@
 
     // remove track and focus to next/previous or prepare new track if removing last track
     trackList.on('click', '.track span.action .remove', function() {
-      var track = $(this).closest('.track');
 
-      var nextTrack = track.next('.track');
-      if (!nextTrack.length)
-        nextTrack = track.prev('.track');
+      //this must be here
+      if (confirm('Do your really want to delete entry?')) {
+        var track = $(this).closest('.track');
 
-      if (!nextTrack.length)
-        prepareTrack();
+        var nextTrack = track.next('.track');
+        if (!nextTrack.length)
+          nextTrack = track.prev('.track');
 
-      deleteTrack(track);
+        if (!nextTrack.length)
+          prepareTrack();
 
-      if (nextTrack.length)
-        nextTrack.find('span.time-start input').focus();
+        deleteTrack(track);
+
+        if (nextTrack.length)
+          nextTrack.find('span.time-start input').focus();
+      }
     });
 
     // autoresize textarea if needed
@@ -76,31 +80,31 @@
         dataType : 'json',
         data : data
       }).done(function(data) {
-          if (data.Status == 'Success') {
-            if (!lines)
-              lines = 1;
+        if (data.Status == 'Success') {
+          if (!lines)
+            lines = 1;
 
-            for (var i = 0; i < lines; i++) {
-              var newTrack = $(data.TrackHtml);
+          for (var i = 0; i < lines; i++) {
+            var newTrack = $(data.TrackHtml);
 
-              if (after)
-                after.after(newTrack);
-              else
-                trackSum.before(newTrack);
+            if (after)
+              after.after(newTrack);
+            else
+              trackSum.before(newTrack);
 
-              newTrack.addClass('unedited');
+            newTrack.addClass('unedited');
 
-              if (!silent) {
-                newTrack.addClass('invalid');
-                newTrack.find('input[name=time-start]').focus().select();
+            if (!silent) {
+              newTrack.addClass('invalid');
+              newTrack.find('input[name=time-start]').focus().select();
 
-                sortTracks(newTrack);
-              }
+              sortTracks(newTrack);
             }
-
-            promise.resolve();
           }
-        });
+
+          promise.resolve();
+        }
+      });
 
       return promise.promise();
     }
@@ -295,35 +299,35 @@
           dataType : 'json',
           data : data
         }).done(function(data) {
-            if (data.Status == 'Success') {
-              track.data('track', data.TrackID);
+          if (data.Status == 'Success') {
+            track.data('track', data.TrackID);
 
-              track.addClass('success').one(animationEnd, function() {
-                console.log('transition end');
-                track.removeClass('success');
+            track.addClass('success').one(animationEnd, function() {
+              console.log('transition end');
+              track.removeClass('success');
+            });
+
+            if (data.Months) {
+              months.empty();
+              $.each(data.Months, function(i, m) {
+                var option = $('<option />');
+                option.text(m.Year + ' / ' + m.Month);
+                option.val(m.Url);
+
+                if (parseInt(m.Year) == parseInt(year) && parseInt(m.Month) == parseInt(month))
+                  option.prop('selected', true);
+
+                months.append(option);
               });
-
-              if (data.Months) {
-                months.empty();
-                $.each(data.Months, function(i, m) {
-                  var option = $('<option />');
-                  option.text(m.Year + ' / ' + m.Month);
-                  option.val(m.Url);
-
-                  if (parseInt(m.Year) == parseInt(year) && parseInt(m.Month) == parseInt(month))
-                    option.prop('selected', true);
-
-                  months.append(option);
-                });
-              }
-            } else {
-              onError();
             }
-          }).fail(function() {
+          } else {
             onError();
-          }).always(function() {
-            track.removeClass('loading');
-          });
+          }
+        }).fail(function() {
+          onError();
+        }).always(function() {
+          track.removeClass('loading');
+        });
       }
     }
 
@@ -342,11 +346,11 @@
           type : 'POST',
           dataType : 'json'
         }).done(function(data) {
-            if (data.Status == 'Success')
-              track.remove();
-          }).always(function() {
-            track.removeClass('loading');
-          });
+          if (data.Status == 'Success')
+            track.remove();
+        }).always(function() {
+          track.removeClass('loading');
+        });
         ;
       }
     }
